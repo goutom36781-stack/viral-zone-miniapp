@@ -1,51 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Viral Zone</title>
-
-<style>
-body{
-    margin:0;
-    background:#111827;
-    color:#fff;
-    font-family:Arial,sans-serif;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-}
-.box{
-    width:320px;
-    background:#1f2937;
-    border-radius:15px;
-    padding:20px;
-    text-align:center;
-}
-button{
-    width:100%;
-    padding:15px;
-    margin-top:15px;
-    border:none;
-    border-radius:10px;
-    background:#7c3aed;
-    color:#fff;
-    font-size:18px;
-}
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viral Zone</title>
+    <!-- টেলিগ্রাম মিনি অ্যাপ স্ক্রিপ্ট -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #1a1a2e; color: #fff; text-align: center; padding: 20px; margin: 0; }
+        .card { background: #161623; border-radius: 15px; padding: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); margin-top: 50px; }
+        .video-thumb { width: 100%; border-radius: 10px; opacity: 0.6; }
+        .btn { background: linear-gradient(45deg, #a83279, #d35400); color: white; border: none; padding: 12px 30px; font-size: 18px; border-radius: 25px; cursor: pointer; font-weight: bold; width: 80%; margin-top: 15px; }
+        .btn:disabled { background: #555; cursor: not-allowed; }
+        #timer { font-size: 20px; color: #ffcc00; margin-top: 10px; font-weight: bold; }
+    </style>
 </head>
 <body>
 
-<div class="box">
-<h2>🎬 Viral Zone</h2>
+    <div class="card">
+        <h3>Viral Zone 🥵</h3>
+        <img src="https://via.placeholder.com/300x180" class="video-thumb" alt="Video Thumbnail">
+        <p id="video-title">ভিডিওটি দেখতে নিচের ৩টি বিজ্ঞাপন সম্পূর্ণ দেখুন</p>
+        
+        <div id="timer" style="display: none;">বিজ্ঞাপন লোড হচ্ছে: <span id="countdown">15</span> সেকেন্ড</div>
+        
+        <button id="unlock-btn" class="btn" onclick="startAdProcess()">আনলক (0/3)</button>
+    </div>
 
-<p>Welcome to my Telegram Mini App</p>
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
 
-<button>▶ Video Play</button>
+        // আপনার মনেট্যাগ এর Direct Link/SmartLink টি নিচের উদাহরণের মতো চিহ্নের মধ্যে বসান
+        const monetagSmartLink = "https://omg10.com/4/11233773"; 
 
-</div>
+        let totalAds = 3;
+        let watchedAds = 0;
+        let countdownTimer;
 
+        function startAdProcess() {
+            if (watchedAds < totalAds) {
+                window.open(monetagSmartLink, '_blank');
+
+                const btn = document.getElementById('unlock-btn');
+                const timerDiv = document.getElementById('timer');
+                const countdownSpan = document.getElementById('countdown');
+                
+                btn.disabled = true;
+                timerDiv.style.display = 'block';
+                let timeLeft = 15; 
+                countdownSpan.innerText = timeLeft;
+
+                countdownTimer = setInterval(() => {
+                    timeLeft--;
+                    countdownSpan.innerText = timeLeft;
+
+                    if (timeLeft <= 0) {
+                        clearInterval(countdownTimer);
+                        timerDiv.style.display = 'none';
+                        watchedAds++;
+                        
+                        btn.disabled = false;
+                        if (watchedAds < totalAds) {
+                            btn.innerText = `আনলক (${watchedAds}/3) - পরবর্তী অ্যাড`;
+                        } else {
+                            btn.innerText = "ভিডিওটি ক্লেইম করুন 🎉";
+                            btn.style.background = "linear-gradient(45deg, #2ecc71, #27ae60)";
+                            btn.onclick = finishTask;
+                        }
+                    }
+                }, 1000);
+            }
+        }
+
+        function finishTask() {
+            tg.sendData("ads_completed_success");
+            tg.close();
+        }
+    </script>
 </body>
 </html>
